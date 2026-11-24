@@ -82,9 +82,8 @@ button, select { font: inherit; }
 .wherebox { margin-left: auto; display: grid; justify-items: end; text-align: right; gap: 1px; min-width: 0; }
 .where { font-family: var(--font-display); font-weight: 700; font-size: 1.05rem; color: var(--ink); }
 .hint { color: var(--muted); font-size: 0.74rem; }
-.mapbox { border-radius: 12px; overflow: hidden; background-color: var(--sea);
-  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
-  background-size: 32px 32px; }
+/* minimal sea: no grid, a quiet grey-blue radial wash; land floats on a soft shadow (SVG filter #landShadow) */
+.mapbox { border-radius: 12px; overflow: hidden; background: radial-gradient(ellipse 75% 65% at 50% 45%, #f1f4f7 0%, #e6ebf0 60%, #d9e0e8 100%); }
 svg#map { width: 100%; height: auto; display: block; }
 svg#map path.r { stroke: #ffffff; stroke-width: 0.7; cursor: pointer; vector-effect: non-scaling-stroke; }
 svg#map path.r:hover, svg#map path.r.sel { stroke: var(--ink); stroke-width: 1.8; }
@@ -346,8 +345,10 @@ const defs = svg.append("defs");
   angles.forEach(a => p.append("path").attr("d", "M-1,9 L9,-1 M-1,1 L1,-1 M7,9 L9,7").attr("stroke", "rgba(255,255,255,0.3)").attr("stroke-width", 1)
     .attr("transform", a < 0 ? "translate(8,0) scale(-1,1)" : null));
 });
+const shadow = defs.append("filter").attr("id", "landShadow").attr("x", "-10%").attr("y", "-10%").attr("width", "120%").attr("height", "125%");
+shadow.append("feDropShadow").attr("dx", 0).attr("dy", 4).attr("stdDeviation", 5).attr("flood-color", "#0e1a2b").attr("flood-opacity", 0.22);
 const gRoot = svg.append("g");
-const gMap = gRoot.append("g"), gBd = gRoot.append("g"), gLbl = gRoot.append("g");
+const gMap = gRoot.append("g").attr("filter", "url(#landShadow)"), gBd = gRoot.append("g"), gLbl = gRoot.append("g");
 let topo, sggFeatures, sidoFeatures, lastPath, animating = false;
 const ZOOM_MS = matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 500;
 function zoomTransform(b) {
